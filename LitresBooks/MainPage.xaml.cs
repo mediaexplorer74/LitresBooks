@@ -16,24 +16,177 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using System.ComponentModel;
 using System.Data;
-using System.Drawing;
+//using System.Drawing;
 using System.Text;
 using System.Threading.Tasks;
-using word = Microsoft.Office.Interop.Word;
-using excel = Microsoft.Office.Interop.Excel;
+//using word = Microsoft.Office.Interop.Word;
+//using excel = Microsoft.Office.Interop.Excel;
 using System.Diagnostics;
+using Microsoft.EntityFrameworkCore; // !
+using System.Data;//.Entity;
+using System.ComponentModel.DataAnnotations.Schema;
 
 
 //
 namespace LitresBooks
 {
+    // Класс Phone, который будет представлять модель телефона
+    // о-вторых, для создания связи "один-ко-многим" зависимая модель должна 
+    // содержать ключ. В нашем случае зависимой моделью является Phone, 
+    // поэтому он определяет ключ в виде двух свойств:
+    //    1) public int CompanyId { get; set; }
+    //    2) public Company Company { get; set; }
+    public class Phone
+    {
+        public int Id { get; set; }
+        public string Title { get; set; }
+        public int Price { get; set; }
+
+
+        public int CompanyId { get; set; }
+        public Company Company { get; set; }
+    }
+
+    // Класс Company, который представляет компанию-производителя телефона
+    public class Company
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+
+        public List<Phone> Phones { get; set; }
+
+        public override string ToString()
+        {
+            return Name;
+        }
+    }
+
+
+    public class DbModelBuilder
+    {
+        // TODO
+        internal object Entity<T>()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    // После определения моделей нам надо добавить в проект класс контекста данных, 
+    // через который приложение будет взаимодействовать с базой данных.
+    // Итак, добавим в проект новый класс MobileContext :
+    public class MobileContext : DbContext
+    {
+        // Класс контекста данных должен быть унаследован от базового класса DbContext, 
+        // а для взаимодействия с таблицами в базе данных в нем определяются свойства 
+        // по типу DbSet<T>. 
+        // То есть через свойство Companies будет идти взаимодействие с таблицей компаний, 
+        // а через свойство Phones - взаимодействие с таблицей телефонов.
+        public DbSet<Company> Companies { get; set; }
+        public DbSet<Phone> Phones { get; set; }
+
+        // ---------------------------------------------
+        //public DbSet<Genre> Genres { get; set; }
+
+        
+        public virtual DbSet<Author> Author { get; set; }
+        public virtual DbSet<Book> Book { get; set; }
+        public virtual DbSet<Genre> Genre { get; set; }
+        public virtual DbSet<Publishing_house> Publishing_house { get; set; }
+        public virtual DbSet<Quote> Quote { get; set; }
+        public virtual DbSet<Series> Series { get; set; }
+        public virtual DbSet<sysdiagrams> sysdiagrams { get; set; }
+
+        // ---------------------------------------------
+        /*
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Author>()
+                .Property(e => e.Name)
+                .IsUnicode(false);
+
+            modelBuilder.Entity<Author>()
+                .Property(e => e.Description)
+                .IsUnicode(false);
+
+            modelBuilder.Entity<Author>()
+                .HasMany(e => e.Book)
+                .WithMany(e => e.Author)
+                .Map(m => m.ToTable("Author_Book").MapLeftKey("AuthorID").MapRightKey("ID"));
+
+            modelBuilder.Entity<Book>()
+                .Property(e => e.Name)
+                .IsUnicode(false);
+
+            modelBuilder.Entity<Book>()
+                .Property(e => e.Description)
+                .IsUnicode(false);
+
+            modelBuilder.Entity<Book>()
+                .Property(e => e.Type)
+                .IsUnicode(false);
+
+            modelBuilder.Entity<Book>()
+                .HasMany(e => e.Genre)
+                .WithMany(e => e.Book)
+                .Map(m => m.ToTable("Book_Genre").MapLeftKey("ID").MapRightKey("GenreID"));
+
+            modelBuilder.Entity<Book>()
+                .HasMany(e => e.Series)
+                .WithMany(e => e.Book)
+                .Map(m => m.ToTable("Series_Book").MapLeftKey("ID").MapRightKey("SeriesID"));
+
+            modelBuilder.Entity<Genre>()
+                .Property(e => e.Name)
+                .IsUnicode(false);
+
+            modelBuilder.Entity<Publishing_house>()
+                .Property(e => e.Name)
+                .IsUnicode(false);
+
+            modelBuilder.Entity<Publishing_house>()
+                .Property(e => e.Description)
+                .IsUnicode(false);
+
+            modelBuilder.Entity<Quote>()
+                .Property(e => e.QuoteText)
+                .IsUnicode(false);
+
+            modelBuilder.Entity<Series>()
+                .Property(e => e.Name)
+                .IsUnicode(false);
+        }
+        */
+        // ---------------------------------------------
+
+
+        // В конструкторе контекста мы генерируем базу данных, 
+        // которая соответствует определению моделей, с помощью 
+        // выражения Database.EnsureCreated().
+        public MobileContext()
+        {
+            Database.EnsureCreated();
+
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseSqlite("Filename=Mobile.db");
+        }
+    }
+
+
+
+
     //MainPage class
     public sealed partial class MainPage : Page
     {
 
         List<Book> books = new List<Book>();
-        BookContext db = new BookContext();
+        
+        //BookContext db = new BookContext();
+        
         List<Genre> genres = new List<Genre>();
+
         List<string> Columns = new List<string>() { "Название книги: ",
                                                     "Цена: ",
                                                     "Тип книги: ",
@@ -54,6 +207,10 @@ namespace LitresBooks
         {
             this.InitializeComponent();
 
+            // -----------------------------------------------------------------
+            this.Loaded += MainPage_Loaded;
+
+#region "Temp"
             // TEMP ------------------------------------------------------------
             /*
             // 
@@ -737,57 +894,82 @@ namespace LitresBooks
             this.PerformLayout();
             */
 
+#endregion
+
+           
+        }//MainPage end
 
 
-            // -----------------------------------------------------------------
-            
-            try
+        // При загрузке страницы срабатывает обработчик MainPage_Loaded, 
+        // в котором получаем список компаний из базы данных и устанавливаем его 
+        // в качестве источника данных для ListView
+        private void MainPage_Loaded(object sender, RoutedEventArgs e)
+        {
+            using (MobileContext db = new MobileContext())
             {
-                foreach (var genre in db.Genre.OrderByDescending(q => q.Book.Count))
+                companiesList.ItemsSource = db.Companies.ToList();
+
+
+                //*******************
+
+                // -----------------------------------------------------------------
+
+                try
                 {
-                    listBox4.Items.Add(genre.Name);
-                    genres.Add(genre);
+                    //foreach (var genre in db.Genre.OrderByDescending(q => q.Book.Count))
+                    foreach (var genre in db.Genre.OrderByDescending(q => q.Book.Count))
+                    {
+                        listBox4.Items.Add(genre.Name);
+                        genres.Add(genre);
+                    }
                 }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine("get Genre.OrderByDescending Exception: " + ex.Message);
+                }
+
+                //*******************
+
             }
-            catch (Exception ex)
-            {
-                Debug.WriteLine("get Genre.OrderByDescending Exception: " + ex.Message);
-            }
-        }//
+        }
 
 
         // button2_Click handler
         private void button2_Click(object sender, RoutedEventArgs e)
         {
-            listBox1.Items.Clear();
-            books.Clear();
-
-            try
+            using (MobileContext db = new MobileContext())
             {
-                foreach (var book in db.Book)
+                listBox1.Items.Clear();
+                books.Clear();
+
+                try
                 {
-                    books.Add(book);
+                    foreach (var book in db.Book)
+                    {
+                        books.Add(book);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine("foreach (var book in db.Book) Exception: " + ex.Message);
+                }
+
+                listBox1.Items.Clear();
+
+                try
+                {
+                    foreach (var book in books)
+                    {
+                        listBox1.Items.Add(book.Name);
+                    }
+                }
+                catch (Exception ex2)
+                {
+                    Debug.WriteLine("foreach (var book in books) Exception:" + ex2.Message);
                 }
             }
-            catch (Exception ex)
-            {
-                Debug.WriteLine("foreach (var book in db.Book) Exception: " + ex.Message);
-            }
 
-            listBox1.Items.Clear();
-
-            try
-            {
-                foreach (var book in books)
-                {
-                    listBox1.Items.Add(book.Name);
-                }
-            }
-            catch (Exception ex2)
-            {
-                Debug.WriteLine("foreach (var book in books) Exception:" + ex2.Message);
-            }
-        }
+        }//button2_Click end
 
         private void listBox1_SelectedIndexChanged(object sender, RoutedEventArgs e)
         {
@@ -835,8 +1017,11 @@ namespace LitresBooks
                         columnInfo.Add(item.Name);
                     break;
                 case 6:
-                    foreach (var item in selectedBook.Genre)
-                        columnInfo.Add(item.Name);
+                    //TODO
+                    //foreach (var item in selectedBook.Genre)
+                    //{
+                    //    columnInfo.Add(item.Name);
+                    //}
                     break;
                 case 7:
                     foreach (var item in selectedBook.Series)
@@ -853,7 +1038,7 @@ namespace LitresBooks
             return columnInfo;
         }
 
-        private void listBox3_SelectedIndexChanged(object sender, RoutedEventArgs e)
+        public void listBox3_SelectedIndexChanged(object sender, RoutedEventArgs e)
         {
             textBox1.Text = "";
 
@@ -868,7 +1053,7 @@ namespace LitresBooks
             }
         }
 
-        private void button3_Click(object sender, RoutedEventArgs e)
+        public void button3_Click(object sender, RoutedEventArgs e)
         {
             if (selectedColumn > 4 && selectedColumn < 9 && selectedData > -1)
             {
@@ -885,12 +1070,15 @@ namespace LitresBooks
                         break;
                     case 6:
                         List<Genre> newGenre = new List<Genre>();
-                        foreach (var item in selectedBook.Genre)
-                            if (item.Name != label9.Text)
-                            {
-                                newGenre.Add(item);
-                            }
-                        selectedBook.Genre = newGenre;
+                        //TODO
+                        //foreach (var item in selectedBook.Genre)
+                        //{
+                        //    if (item.Name != label9.Text)
+                        //    {
+                        //        newGenre.Add(item);
+                        //    }
+                        //}
+                        //selectedBook.Genre = newGenre;
                         break;
                     case 7:
                         List<Series> newSeries = new List<Series>();
@@ -917,7 +1105,7 @@ namespace LitresBooks
             listBox3.Items.Clear();
         }
 
-        private void button5_Click(object sender, RoutedEventArgs e)
+        public void button5_Click(object sender, RoutedEventArgs e)
         {
             string data2red = textBox1.Text;
             switch (selectedColumn)
@@ -946,191 +1134,212 @@ namespace LitresBooks
             }
             Info2list2();
             listBox3.Items.Clear();
-        }
 
-        private void button4_Click(object sender, RoutedEventArgs e)
+        }//
+
+
+        // 
+        public void button4_Click(object sender, RoutedEventArgs e)
         {
-            if (selectedColumn > 4 && selectedColumn < 9 && textBox1.Text != "")
+            using (MobileContext db = new MobileContext())
             {
-                switch (selectedColumn)
+                if (selectedColumn > 4 && selectedColumn < 9 && textBox1.Text != "")
                 {
-                    case 5:
-                        List<Author> Authors = new List<Author>();
-                        foreach (var item in selectedBook.Author)
-                            Authors.Add(item);
+                    switch (selectedColumn)
+                    {
+                        case 5:
+                            List<Author> Authors = new List<Author>();
+                            foreach (var item in selectedBook.Author)
+                                Authors.Add(item);
 
-                        Author a2ch = db.Author.FirstOrDefault(q => q.Name == textBox1.Text);
-                        if (a2ch == null)
-                        {
-                            Author newAuthor = new Author();
-                            newAuthor.AuthorID = 0;
-                            newAuthor.Name = textBox1.Text;
-                            a2ch = newAuthor;
-                        }
-                        a2ch.Book.Add(selectedBook);
-                        Authors.Add(a2ch);
-                        selectedBook.Author = Authors;
-                        //DBSave();
-                        break;
-                    case 6:
-                        Genre g2ch = db.Genre.FirstOrDefault(q => q.Name == textBox1.Text);
-                        if (g2ch == null)
-                        {
-                            Genre newGenre = new Genre();
-                            newGenre.GenreID = 0;
-                            newGenre.Name = textBox1.Text;
-                            g2ch = newGenre;
-                        }
-                        selectedBook.Genre.Add(g2ch);
-                        g2ch.Book.Add(selectedBook);
-                        DBSave();
-                        break;
-                    case 7:
-                        Series s2ch = db.Series.FirstOrDefault(q => q.Name == textBox1.Text);
-                        if (s2ch == null)
-                        {
-                            Series newSeries = new Series();
-                            newSeries.SeriesID = 0;
-                            newSeries.Name = textBox1.Text;
-                            s2ch = newSeries;
-                        }
-                        selectedBook.Series.Add(s2ch);
-                        s2ch.Book.Add(selectedBook);
-                        DBSave();
-                        break;
-                    case 8:
-                        Quote newQuote = new Quote();
-                        newQuote.QuoteID = 0;
-                        newQuote.QuoteText = textBox1.Text;
-                        selectedBook.Quote.Add(newQuote);
-                        DBSave();
-                        break;
+                            Author a2ch = db.Author.FirstOrDefault(q => q.Name == textBox1.Text);
+                            if (a2ch == null)
+                            {
+                                Author newAuthor = new Author();
+                                newAuthor.AuthorID = 0;
+                                newAuthor.Name = textBox1.Text;
+                                a2ch = newAuthor;
+                            }
+                            //TODO
+                            //a2ch.Book.Add(selectedBook);
+                            Authors.Add(a2ch);
+                            selectedBook.Author = Authors;
+                            //DBSave();
+                            break;
+                        case 6:
+                            Genre g2ch = db.Genre.FirstOrDefault(q => q.Name == textBox1.Text);
+                            if (g2ch == null)
+                            {
+                                Genre newGenre = new Genre();
+                                newGenre.GenreID = 0;
+                                newGenre.Name = textBox1.Text;
+                                g2ch = newGenre;
+                            }
+                            //TODO
+                            //selectedBook.Genre.Add(g2ch);
+                            g2ch.Book.Add(selectedBook);
+                            DBSave();
+                            break;
+                        case 7:
+                            Series s2ch = db.Series.FirstOrDefault(q => q.Name == textBox1.Text);
+                            if (s2ch == null)
+                            {
+                                Series newSeries = new Series();
+                                newSeries.SeriesID = 0;
+                                newSeries.Name = textBox1.Text;
+                                s2ch = newSeries;
+                            }
+                            selectedBook.Series.Add(s2ch);
+                            s2ch.Book.Add(selectedBook);
+                            DBSave();
+                            break;
+                        case 8:
+                            Quote newQuote = new Quote();
+                            newQuote.QuoteID = 0;
+                            newQuote.QuoteText = textBox1.Text;
+                            selectedBook.Quote.Add(newQuote);
+                            DBSave();
+                            break;
+                    }
                 }
+                else textBox2.Text = "Информацию к данной колонке нельзя добавить";
+                Info2list2();
+                listBox3.Items.Clear();
             }
-            else textBox2.Text = "Информацию к данной колонке нельзя добавить";
-            Info2list2();
-            listBox3.Items.Clear();
-        }
 
-        private void button6_Click(object sender, RoutedEventArgs e)
+        }//end
+
+        // 
+        public void button6_Click(object sender, RoutedEventArgs e)
         {
             DBSave();
         }
 
-        private void DBSave()
+        public void DBSave()
         {
-            //db.Book.Remove(db.Book.FirstOrDefault(q => q.ID == id));
-            //db.SaveChanges();
-            //db.Book.Add(selectedBook);
-            db.SaveChanges();
-            int selectedBookIndex = listBox1.SelectedIndex;
-            listBox1.Items.RemoveAt(selectedBookIndex);
-            listBox1.Items.Insert(selectedBookIndex, selectedBook.Name);
-            listBox2.Items.Clear();
-            listBox3.Items.Clear();
-            textBox1.Text = "";
-            textBox2.Text = "Сохранение прошло успешно";
-            label2.Text = "";
-            label6.Text = "";
-            label9.Text = "";
-        }
+            using (MobileContext db = new MobileContext())
+            {
+                //db.Book.Remove(db.Book.FirstOrDefault(q => q.ID == id));
+                //db.SaveChanges();
+                //db.Book.Add(selectedBook);
+                db.SaveChanges();
+                int selectedBookIndex = listBox1.SelectedIndex;
+                listBox1.Items.RemoveAt(selectedBookIndex);
+                listBox1.Items.Insert(selectedBookIndex, selectedBook.Name);
+                listBox2.Items.Clear();
+                listBox3.Items.Clear();
+                textBox1.Text = "";
+                textBox2.Text = "Сохранение прошло успешно";
+                label2.Text = "";
+                label6.Text = "";
+                label9.Text = "";
+            }
+
+        }//end
 
         public void button7_Click(object sender, RoutedEventArgs e)
         {
-            try
+            using (MobileContext db = new MobileContext())
             {
-                Book newBook = new Book();
-                if (db.Book.Count() != 0)
-                    newBook.ID = db.Book.Max(q => q.ID) + 1;
-                newBook.Name = textBox3.Text;
-                newBook.Price = Convert.ToDouble(textBox9.Text);
-                newBook.Type = textBox5.Text;
-                newBook.LitresEstimate = Convert.ToDouble(textBox7.Text);
-                newBook.Description = textBox12.Text;
-                newBook.Actual_date = DateTime.Now.Date;
-                string[] words = textBox4.Text.Split(';');
-                foreach (var w2ch in words)
+                try
                 {
-                    string word = w2ch.Trim();
-                    Author item = db.Author.FirstOrDefault(q => q.Name == word);
-                    if (item == null)
+                    Book newBook = new Book();
+                    if (db.Book.Count() != 0)
+                        newBook.ID = db.Book.Max(q => q.ID) + 1;
+                    newBook.Name = textBox3.Text;
+                    newBook.Price = Convert.ToDouble(textBox9.Text);
+                    newBook.Type = textBox5.Text;
+                    newBook.LitresEstimate = Convert.ToDouble(textBox7.Text);
+                    newBook.Description = textBox12.Text;
+                    newBook.Actual_date = DateTime.Now.Date;
+                    string[] words = textBox4.Text.Split(';');
+                    foreach (var w2ch in words)
                     {
-                        Author newItem = new Author();
-                        newItem.Name = word;
-                        item = newItem;
+                        string word = w2ch.Trim();
+                        Author item = db.Author.FirstOrDefault(q => q.Name == word);
+                        if (item == null)
+                        {
+                            Author newItem = new Author();
+                            newItem.Name = word;
+                            item = newItem;
+                        }
+                        newBook.Author.Add(item);
                     }
-                    newBook.Author.Add(item);
-                }
-                words = textBox10.Text.Split(';');
-                foreach (var w2ch in words)
-                {
-                    string word = w2ch.Trim();
-                    Genre item = db.Genre.FirstOrDefault(q => q.Name == word);
-                    if (item == null)
+                    words = textBox10.Text.Split(';');
+                    foreach (var w2ch in words)
                     {
-                        Genre newItem = new Genre();
-                        newItem.Name = word;
-                        item = newItem;
+                        string word = w2ch.Trim();
+                        Genre item = db.Genre.FirstOrDefault(q => q.Name == word);
+                        if (item == null)
+                        {
+                            Genre newItem = new Genre();
+                            newItem.Name = word;
+                            item = newItem;
+                        }
+                        //TODO
+                        //newBook.Genre.Add(item);
                     }
-                    newBook.Genre.Add(item);
-                }
-                words = textBox6.Text.Split(';');
-                foreach (var w2ch in words)
-                {
-                    string word = w2ch.Trim();
-                    Series item = db.Series.FirstOrDefault(q => q.Name == word);
-                    if (item == null)
+                    words = textBox6.Text.Split(';');
+                    foreach (var w2ch in words)
                     {
-                        Series newItem = new Series();
-                        newItem.Name = word;
-                        item = newItem;
+                        string word = w2ch.Trim();
+                        Series item = db.Series.FirstOrDefault(q => q.Name == word);
+                        if (item == null)
+                        {
+                            Series newItem = new Series();
+                            newItem.Name = word;
+                            item = newItem;
+                        }
+                        newBook.Series.Add(item);
                     }
-                    newBook.Series.Add(item);
-                }
-                words = textBox11.Text.Split(';');
-                foreach (var w2ch in words)
-                {
-                    string word = w2ch.Trim();
-                    Quote item = db.Quote.FirstOrDefault(q => q.QuoteText == word);
-                    if (item == null)
+                    words = textBox11.Text.Split(';');
+                    foreach (var w2ch in words)
                     {
-                        Quote newItem = new Quote();
-                        newItem.QuoteText = word;
-                        item = newItem;
+                        string word = w2ch.Trim();
+                        Quote item = db.Quote.FirstOrDefault(q => q.QuoteText == word);
+                        if (item == null)
+                        {
+                            Quote newItem = new Quote();
+                            newItem.QuoteText = word;
+                            item = newItem;
+                        }
+                        newBook.Quote.Add(item);
                     }
-                    newBook.Quote.Add(item);
-                }
 
-                string PH = textBox8.Text.Trim();
-                Publishing_house ph2ch = db.Publishing_house.FirstOrDefault(q => q.Name == PH);
-                if (ph2ch == null)
-                {
-                    Publishing_house newItem = new Publishing_house();
-                    newItem.Name = PH;
-                    db.Publishing_house.Add(newItem);
-                    ph2ch = newItem;
+                    string PH = textBox8.Text.Trim();
+                    Publishing_house ph2ch = db.Publishing_house.FirstOrDefault(q => q.Name == PH);
+                    if (ph2ch == null)
+                    {
+                        Publishing_house newItem = new Publishing_house();
+                        newItem.Name = PH;
+                        db.Publishing_house.Add(newItem);
+                        ph2ch = newItem;
+                    }
+                    ph2ch.Book.Add(newBook);
+                    db.Book.Add(newBook);
+                    DBSave();
                 }
-                ph2ch.Book.Add(newBook);
-                db.Book.Add(newBook);
-                DBSave();
+                catch
+                {
+                    label17.Text = "Некорректные данные, \nпопробуйте снова";
+                }
             }
-            catch
-            {
-                label17.Text = "Некорректные данные, \nпопробуйте снова";
-            }
-        }
+        }//end
 
         private void button8_Click(object sender, RoutedEventArgs e)
         {
-            if (listBox1.SelectedIndex > -1)
+            using (MobileContext db = new MobileContext())
             {
-                int id = Convert.ToInt32(label2.Text);
-                int selectedBookIndex = listBox1.SelectedIndex;
-                db.Book.Remove(db.Book.FirstOrDefault(q => q.ID == id));
-                DBSave();
-                books.RemoveAt(selectedBookIndex);
-                listBox1.Items.RemoveAt(selectedBookIndex);
-                label24.Text = "Удаление произведено успешно";
+                if (listBox1.SelectedIndex > -1)
+                {
+                    int id = Convert.ToInt32(label2.Text);
+                    int selectedBookIndex = listBox1.SelectedIndex;
+                    db.Book.Remove(db.Book.FirstOrDefault(q => q.ID == id));
+                    DBSave();
+                    books.RemoveAt(selectedBookIndex);
+                    listBox1.Items.RemoveAt(selectedBookIndex);
+                    label24.Text = "Удаление произведено успешно";
+                }
             }
         }
 
@@ -1159,8 +1368,13 @@ namespace LitresBooks
                 foreach (var auth in selectedBook.Author)
                     authors += auth.Name + ", ";
                 var genres = "  ";
-                foreach (var gen in selectedBook.Genre)
-                    genres += gen.Name + ", ";
+
+                //TODO
+                //foreach (var gen in selectedBook.Genre)
+                //{
+                //    genres += gen.Name + ", ";
+                //}
+
                 var series = "  ";
                 foreach (var ser in selectedBook.Series)
                     series += ser.Name + ", ";
@@ -1247,6 +1461,7 @@ namespace LitresBooks
         // 
         private void GenerateReportTopGenres(Dictionary<string, double> dictionary)
         {
+            /*
             excel.Application excelApp = new excel.Application();
             excel.Workbook workbook;
             excel.Worksheet workSheet;
@@ -1309,18 +1524,21 @@ namespace LitresBooks
             wordReport.GenerateReportTopGenres(dictionary);
 
             excelApp.Quit();
+            */
         }
 
         public class WordReportTopBookOfGenre
         {
 
-            public word.Application wordapp = new word.Application();
-            public word.Documents worddocuments;
-            public word.Document worddocument;
-            static string path = @"C:\Users\acer\Desktop\Учеба\АИС\Отчет по жанру.doc";
+            //public word.Application wordapp = new word.Application();
+            //public word.Documents worddocuments;
+            //public word.Document worddocument;
+            //static string path = @"C:\Users\acer\Desktop\Учеба\АИС\Отчет по жанру.doc";
 
+            // 
             public WordReportTopBookOfGenre(string pathFrom)
             {
+                /*
                 path = pathFrom;
                 wordapp = new word.Application();
                 wordapp.Visible = true;
@@ -1335,16 +1553,19 @@ namespace LitresBooks
                 worddocument = worddocuments.get_Item(1);
                 //wordapp.Visible = false;
                 worddocument.Activate();
+                */
             }
 
             public void GenerateReportTopBooksOfG(string genreName, List<Book> booksOfGenre)
             {
+                /*
                 string[] header = new string[3] { "Название книги", "Оценка", "Описание" };
                 TableCreateBook(booksOfGenre.Count, 3, header, booksOfGenre);
                 Replace("{ЖАНР}", genreName.ToUpper());
                 string fileName = "Отчет по жанру(" + genreName + ")";
                 TrySave(fileName);
                 appClose();
+                */
             }
 
             public void GenerateReportTopGenres(Dictionary<string, double> dictionary)
@@ -1359,16 +1580,19 @@ namespace LitresBooks
 
             public void Replace(string wordr, string replacement)
             {
+                /*
                 word.Range range = worddocument.StoryRanges[word.WdStoryType.wdMainTextStory];
                 range.Find.ClearFormatting();
 
                 range.Find.Execute(FindText: wordr, ReplaceWith: replacement);
 
                 //TrySave();
+                */
             }
 
             public void TrySave(string fileName)
             {
+                /*
                 try
                 {
                     string outputPath = @"C:\Users\acer\Desktop\Учеба\АИС\" + fileName + ".doc";
@@ -1379,10 +1603,13 @@ namespace LitresBooks
                 {
                     Console.WriteLine(e.Message);
                 }
+                */
             }
 
+            //
             public void TableCreateBook(int row, int col, string[] header, List<Book> books)
             {
+                /*
                 Object start = 94;
                 Object end = 95;
                 word.Range wordrange = worddocument.Range(ref start, ref end);
@@ -1413,10 +1640,13 @@ namespace LitresBooks
                 Single firstColAutoWidth = firstCol.Width;
                 wordtable.AutoFitBehavior(word.WdAutoFitBehavior.wdAutoFitWindow);
                 firstCol.SetWidth(firstColAutoWidth, word.WdRulerStyle.wdAdjustFirstColumn);
+                */
             }
 
+            //
             public void TableCreateGenre(int row, int col, string[] header, Dictionary<string, double> dictionary)
             {
+                /*
                 Object start = 80;
                 Object end = 81;
                 word.Range wordrange = worddocument.Range(ref start, ref end);
@@ -1457,16 +1687,19 @@ namespace LitresBooks
                 word.Range picRange = worddocument.Range(ref rStart, ref rEnd);
 
                 picRange.InlineShapes.AddPicture(@"C:\Users\acer\Desktop\Учеба\АИС\Graf.bmp");
+                */
             }
 
+            //
             public void appClose()
             {
-                object saveChanges = word.WdSaveOptions.wdPromptToSaveChanges;
-                object originalFormat = word.WdOriginalFormat.wdWordDocument;
-                object routeDocument = Type.Missing;
-                wordapp.Quit(ref saveChanges, ref originalFormat, ref routeDocument);
+                //object saveChanges = word.WdSaveOptions.wdPromptToSaveChanges;
+                //object originalFormat = word.WdOriginalFormat.wdWordDocument;
+                //object routeDocument = Type.Missing;
+                //wordapp.Quit(ref saveChanges, ref originalFormat, ref routeDocument);
             }
-        }
+
+        }//class end
 
         // 
         public async void button1_ClickAsync(object sender, RoutedEventArgs e)
@@ -1490,7 +1723,20 @@ namespace LitresBooks
 
         }//button1_ClickAsync end
 
+        private void Add_Click(object sender, RoutedEventArgs e)
+        {
+            //
+        }
 
+        private void Edit_Click(object sender, RoutedEventArgs e)
+        {
+            //
+        }
+
+        private void Delete_Click(object sender, RoutedEventArgs e)
+        {
+            //
+        }
     }//class end
 
 }

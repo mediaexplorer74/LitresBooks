@@ -3,11 +3,12 @@
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using Microsoft.EntityFrameworkCore; // using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
+using System.Data;//.Entity;
 
 namespace LitresBooks
 {
-   
+   /*
 
     public partial class BookContext : DbContext
     {
@@ -24,7 +25,7 @@ namespace LitresBooks
         public virtual DbSet<Series> Series { get; set; }
         public virtual DbSet<sysdiagrams> sysdiagrams { get; set; }
 
-        /*
+        
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Author>()
@@ -82,7 +83,8 @@ namespace LitresBooks
                 .Property(e => e.Name)
                 .IsUnicode(false);
         }
-        */
+        
+        
     }
 
     public class DbModelBuilder
@@ -93,4 +95,5 @@ namespace LitresBooks
             throw new NotImplementedException();
         }
     }
+    */
 }

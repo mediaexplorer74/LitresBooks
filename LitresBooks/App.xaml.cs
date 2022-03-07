@@ -14,6 +14,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using Microsoft.EntityFrameworkCore; // !
 
 namespace LitresBooks
 {
@@ -30,6 +31,15 @@ namespace LitresBooks
         {
             this.InitializeComponent();
             this.Suspending += OnSuspending;
+
+            //  изменим код файла App.xaml.cs, 
+            //  чтобы при запуске приложения создавалась новая база данных по этим миграциям
+            using (var db = new MobileContext())
+            {
+                db.Database.Migrate();
+
+                //
+            }
         }
 
         /// <summary>

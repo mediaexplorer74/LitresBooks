@@ -11,10 +11,11 @@ namespace LitresBooks
     [Table("Author")]
     public partial class Author
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        //[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public Author()
         {
-            Book = new HashSet<Book>();
+            //TODO
+            //Book = new HashSet<Book>();
         }
 
         public int AuthorID { get; set; }
@@ -26,7 +27,9 @@ namespace LitresBooks
         [Column(TypeName = "text")]
         public string Description { get; set; }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Book> Book { get; set; }
+        //[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+
+        //TODO
+        //public virtual ICollection<Book> Book { get; set; }
     }
 }
