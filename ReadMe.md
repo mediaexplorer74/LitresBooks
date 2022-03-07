@@ -14,6 +14,6 @@ Status: bad (db errors)
 
 ## Screenshots
 
-![showcase](Images/Shot1.png)
+![showcase](Images/shot1.png)
 
 -- [m][e] 2022
