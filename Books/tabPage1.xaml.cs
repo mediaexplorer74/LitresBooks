@@ -1,4 +1,6 @@
-﻿using PocketApi;
+﻿// tabPage1
+
+using PocketApi;
 using PocketApi.Models;
 using System;
 using System.Collections.Generic;
@@ -52,7 +54,7 @@ namespace NfcSample
 
             LitresSecrets.LitresAPIConsumerKey = new PocketApi.Models.AccessData();
             LitresSecrets.LitresAPIConsumerKey.Token = "";
-                        
+
             LitresSecrets.LitresAPIConsumerKey.Login = "xxxxxxx@xxx.ru"; // Paste your login here
             LitresSecrets.LitresAPIConsumerKey.Password = "xxxxxxx"; // Paste your pwd here
 

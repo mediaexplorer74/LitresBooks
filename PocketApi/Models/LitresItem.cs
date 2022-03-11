@@ -78,6 +78,12 @@ namespace PocketApi.Models
         [JsonProperty("top_image_url")]
         public string TopImageUrl { get; set; }
 
+        [JsonProperty("first_name")]
+        public string FirstName { get; set; }
+
+        [JsonProperty("last_name")]
+        public string LastName { get; set; }
+
         [JsonProperty("author_array")]
         public List<LitresAuthor> Authors { get; set; }
 

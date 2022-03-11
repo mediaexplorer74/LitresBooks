@@ -63,8 +63,15 @@ namespace PocketApi
 
             //Debug.WriteLine(sidAttr.Value);
 
-            token.Sid = sidAttr.Value;
-            token.UserId = useridAttr.Value;
+            try
+            {
+                token.Sid = sidAttr.Value;
+                token.UserId = useridAttr.Value;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("[ex] GetNamedItem(sid/user-id) Exception: " + ex.Message);
+            }
 
             /*
             if (xRoot != null)

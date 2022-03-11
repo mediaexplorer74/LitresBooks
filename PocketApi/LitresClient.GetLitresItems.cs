@@ -73,7 +73,7 @@ namespace PocketApi
             XmlElement xRoot = xDoc.DocumentElement;
 
             // get sid attr
-            //XmlNode sidAttr = xRoot.Attributes.GetNamedItem("sid");
+            XmlNode booktitleAttr = xRoot.Attributes.GetNamedItem("book-title");
 
            
             // get user-id attr
@@ -100,9 +100,9 @@ namespace PocketApi
 
 
                     // получаем атрибут Filename
-                    XmlNode attrFilneame = xnode.Attributes.GetNamedItem("filename");
+                    XmlNode attrFilename = xnode.Attributes.GetNamedItem("filename");
 
-                    Debug.WriteLine(attrFilneame?.Value);
+                    Debug.WriteLine(attrFilename?.Value);
 
                     // получаем атрибут Cover
                     XmlNode attrCover = xnode.Attributes.GetNamedItem("cover");
@@ -115,39 +115,90 @@ namespace PocketApi
 
                     Debug.WriteLine(attrUrl?.Value);
 
-                    
+                    // получаем атрибут Url
+                    XmlNode attrBookTitle = xnode.Attributes.GetNamedItem("book-title");
+
+                    Debug.WriteLine(attrBookTitle?.Value);
+
+
 
                     string attrTitle = "Test title";
+                    string attrFirstName = "First name";
+                    string attrLastName = "Last name";
 
-                    
+
                     // обходим все дочерние узлы элемента user
                     foreach (XmlNode childnode in xnode.ChildNodes)
                     {
 
-                        // если узел - company
-                        if (childnode.Name == "book-title")
+                        // если узел - text_description
+                        if (childnode.Name == "text_description")
                         {
-                            Debug.WriteLine($"book-title: {childnode.InnerText}");
-                            attrTitle = childnode.InnerText;
+                            // обходим все дочерние узлы элемента childnode
+                            foreach (XmlNode node1 in childnode.ChildNodes)
+                            {
+                                //Debug.WriteLine($"text-description: {childnode.InnerText}");
+                                //attrTitle = childnode.InnerText;
+                                //XmlNode booktitleAttr = childnode.Attributes.GetNamedItem("book-title");
+
+                                // обходим все дочерние узлы элемента node1
+                                foreach (XmlNode node2 in node1.ChildNodes)
+                                {
+
+
+                                    foreach (XmlNode node3 in node2.ChildNodes)
+                                    {
+
+                                        if (node3.Name == "book-title")
+                                        {
+                                            Debug.WriteLine($"book-title: {node3.InnerText}");
+
+                                            attrTitle = node3.InnerText;
+                                        }
+
+                                        if (node2.Name == "title-info" && node3.Name == "author")
+                                        {
+                                            foreach (XmlNode node4 in node3.ChildNodes)
+                                            {
+                                                if (node4.Name == "first-name")
+                                                {
+                                                    Debug.WriteLine($"first-name: {node4.InnerText}");
+
+                                                    attrFirstName = node4.InnerText;
+                                                }
+
+
+                                                if (node4.Name == "last-name")
+                                                {
+                                                    Debug.WriteLine($"last-name: {node4.InnerText}");
+
+                                                    attrLastName = node4.InnerText;
+                                                }
+                                            }
+                                        }//if author...
+                                    }//for...
+                                }//for...
+                            }//for...
+
+
                         }
 
-                        // если узел - company
-                        if (childnode.Name == "sid")
-                        {
-                            Debug.WriteLine($"sid: {childnode.InnerText}");
-                        }
+                        // если узел - sid
+                        //if (childnode.Name == "sid")
+                        //{
+                        //    Debug.WriteLine($"sid: {childnode.InnerText}");
+                        //}
 
-                        // если узел age
-                        if (childnode.Name == "catalit-authorization-ok")
-                        {
-                            Debug.WriteLine($"catalit-authorization-ok: {childnode.InnerText}");
-
-                            //token.Sid = childnode.InnerText;
-                        }
+                        // если узел - catalit-authorization-ok
+                        //if (childnode.Name == "catalit-authorization-ok")
+                        //{
+                        //    Debug.WriteLine($"catalit-authorization-ok: {childnode.InnerText}");
+                        //  token.Sid = childnode.InnerText;
+                        //}
 
 
                     }//for 
-                    
+
 
                     Debug.WriteLine("-- end --");
 
@@ -156,7 +207,9 @@ namespace PocketApi
                         Id = attrHubId.Value,
                         GivenTitle = attrTitle,
                         ResolvedId = attrHubId.Value, // temp
-                        ResolvedTitle = "Test title", // temp
+                        ResolvedTitle = attrTitle,//"Test title", // temp
+                        FirstName = attrFirstName,
+                        LastName = attrLastName,
                         GivenUrl = attrUrl.Value,
                         TopImageUrl = attrCover.Value,
                         Status = "1",

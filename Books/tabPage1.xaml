@@ -26,6 +26,10 @@
                         <!--Image Source="{x:Bind Image.Source}" Width="75" Height="75" 
                                Stretch="UniformToFill" Margin="0,0,6,0"/-->
                         <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="{x:Bind FirstName}" FontWeight="Light" 
+                                       TextWrapping="NoWrap" Width="100"/>
+                            <TextBlock Text="{x:Bind LastName}" FontWeight="Light" 
+                                       TextWrapping="Wrap" Width="225"/>
                             <TextBlock Text="{x:Bind GivenTitle}" FontWeight="Bold" 
                                        TextWrapping="Wrap" Width="325"/>
                             <TextBlock Text="{x:Bind GivenUrl}"/>
