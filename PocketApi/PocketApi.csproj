@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.4</TargetFramework>
+    <PackageId>Nickward13.PocketApi</PackageId>
+    <Version>0.2.2</Version>
+    <Authors>Nick Ward</Authors>
+    <Company />
+    <Description>An API wrapper for Pocket's API (https://getpocket.com/developer/docs/overview)</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/nickward13/PocketApi</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>Pocket, getpocket, getpocket.com</PackageTags>
+    <PackageReleaseNotes>Ensure PocketItem can be serialized and deserialized fully to json</PackageReleaseNotes>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="System.Collections" Version="4.3.0" />
+  </ItemGroup>
+
+</Project>
