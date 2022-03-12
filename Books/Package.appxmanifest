@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" IgnorableNamespaces="uap mp">
-  <Identity Name="ME.Books1" Publisher="CN=media" Version="1.0.0.0" />
-  <mp:PhoneIdentity PhoneProductId="6e734725-bffe-4c38-b72a-39a7a43dfa4d" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
+  <Identity Name="MEBooks1" Publisher="CN=media" Version="1.0.0.0" />
+  <mp:PhoneIdentity PhoneProductId="6e734725-bffe-4c38-b72a-98a7a43dfa4d" PhonePublisherId="98000098-0000-0098-0090-099000000000" />
   <Properties>
-    <DisplayName>Books</DisplayName>
+    <DisplayName>MEBooks1</DisplayName>
     <PublisherDisplayName>media</PublisherDisplayName>
     <Logo>Assets\StoreLogo-sdk.png</Logo>
   </Properties>

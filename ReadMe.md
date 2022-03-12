@@ -7,6 +7,7 @@ This app is UWP sample.
 
 ## Screenshots
 ![Shot 1](Images/shot1.png)
+![Shot 2](Images/shot2.png)
 
 ## System requirements
 
